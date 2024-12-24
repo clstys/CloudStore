@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Store</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Video Background */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            object-fit: cover;
+        }
+
+        /* Overlay to enhance text visibility */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            background: #000; /* اللون الأسود للأزرار */
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: #333; /* اللون عند المرور */
+            transform: scale(1.1);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero img {
+            width: 300px;
+            height: auto;
+            margin-bottom: 1rem;
+            animation: slideDown 1s ease-in-out;
+        }
+
+        /* تحسين شكل الزر */
+        .purchase-btn {
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            color: #fff;
+            background: #4CAF50; /* تغيير اللون ليتناسب مع التصميم */
+            border: none;
+            border-radius: 25px; /* جعل الزر أكثر أناقة */
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .purchase-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* تعديل قسم المنتجات ليكون في منتصف الصفحة */
+        .products {
+            padding: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            margin-top: 6rem; /* تعديل المسافة لرفعها قليلاً */
+        }
+
+        .card-container {
+            display: flex;
+            gap: 3rem; /* زيادة المسافة بين المنتجات */
+            justify-content: center;
+            flex-wrap: wrap;
+            direction: rtl; /* عرض المنتجات من اليمين إلى اليسار */
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3rem; /* زيادة الحجم للمنتج */
+            border-radius: 15px;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            max-width: 500px; /* تكبير المنتجات */
+            flex-grow: 1;
+            margin: 20px;
+        }
+
+        .card img {
+            width: 100%; /* تأكد أن الصورة تملأ عرض الصندوق */
+            max-width: 300px; /* تعيين حجم ثابت لجميع الصور */
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        /* نموذج تواصل معنا */
+        .contact-form {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #000; /* جعل الخلفية سوداء للنموذج */
+            padding: 3rem;
+            border-radius: 10px;
+            max-width: 500px;
+            display: none; /* إخفاء النموذج بشكل افتراضي */
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background: #222;
+            color: #fff;
+        }
+
+        /* سلة التسوق */
+        .cart {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            padding: 1rem;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cart:hover {
+            background: #45a049;
+        }
+
+        /* زر إرسال */
+        .send-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 1rem;
+            font-size: 1.1rem;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <video class="video-background" autoplay loop muted>
+        <source src="background.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="overlay"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <span class="navbar-brand">Cloud Store</span>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showProducts()">منتجات</a></li>
+                <li><a href="#" onclick="showContactForm()">تواصل معنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- سلة التسوق -->
+    <div class="cart">
+        🛒
+    </div>
+
+    <!-- قسم المنتجات -->
+    <section id="items" class="products">
+        <h2>منتجاتنا</h2>
+        <div class="card-container">
+            <div class="card">
+                <img src="image1.jpg" alt="نيترو شهري"> <!-- صورة المنتج الأول -->
+                <h3>نيترو شهري</h3>
+                <p>نيترو حصري بأقل الأسعار!</p>
+                <button class="purchase-btn">شراء</button>
+            </div>
+            <div class="card">
+                <img src="image2.jpg" alt="بوستات"> <!-- صورة المنتج الثاني -->
+                <h3>بوستات</h3>
+                <p>بوستات حصريه بأقل الأسعار!</p>
+                <button class="purchase-btn">شراء</button>
+            </div>
+            <div class="card">
+                <img src="image3.jpg" alt="كروت ايتونز"> <!-- صورة المنتج الثالث -->
+                <h3>كروت ايتونز</h3>
+                <p>كروت ايتونز مقابل كردت</p>
+                <button class="purchase-btn">شراء</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- نموذج تواصل معنا -->
+    <div id="contactForm" class="contact-form">
+        <h2>تواصل معنا</h2>
+        <form id="contactFormSubmit">
+            <input type="email" id="email" placeholder="البريد الإلكتروني" required><br>
+            <input type="text" id="discord" placeholder="اسم الديسكورد" required><br>
+            <textarea id="message" placeholder="رسالتك أو مشكلتك" required></textarea><br>
+            <button type="submit" class="send-btn">إرسال</button>
+        </form>
+    </div>
+
+    <!-- جافاسكربت لإظهار الأقسام -->
+    <script>
+        function showContactForm() {
+            var form = document.getElementById('contactForm');
+            var productsSection = document.getElementById('items');
+            form.style.display = 'block'; // إظهار النموذج عند الضغط
+            productsSection.style.display = 'none'; // إخفاء قسم المنتجات
+        }
+
+        function showProducts() {
+            var productsSection = document.getElementById('items');
+            var form = document.getElementById('contactForm');
+            form.style.display = 'none'; // إخفاء نموذج التواصل
+            productsSection.style.display = 'block'; // إظهار قسم المنتجات
+        }
+
+        // إرسال الرسالة إلى ديسكورد
+        document.getElementById('contactFormSubmit').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var email = document.getElementById('email').value;
+            var discord = document.getElementById('discord').value;
+            var message = document.getElementById('message').value;
+
+            const webhookUrl = "https://discord.com/api/webhooks/1320762892051677184/bHxhE4AzsGxdZFJafYf6HY4mw7_EA9q1ZOmMPdgwjjSnK3laZFcgh0t1ESxo5JkqM2et";
+            const data = {
+                content: `تم استلام رسالة جديدة من نموذج تواصل معنا!\n\nالبريد الإلكتروني: ${email}\nاسم الديسكورد: ${discord}\nالرسالة: ${message}`
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("تم إرسال الرسالة بنجاح!");
+                    document.getElementById('contactForm').reset(); // إعادة تعيين النموذج
+                } else {
+                    alert("فشل إرسال الرسالة.");
+                }
+            })
+            .catch(error => {
+                console.error("Error sending message:", error);
+                alert("حدث خطأ أثناء إرسال الرسالة.");
+            });
+        });
+    </script>
+</body>
+</html>
+<script>
+    // عرض نموذج التواصل
+    function showContactFormWithInfo() {
+        var form = document.getElementById('contactForm');
+        var productsSection = document.getElementById('items');
+        form.style.display = 'block'; // إظهار النموذج
+        productsSection.style.display = 'none'; // إخفاء قسم المنتجات
+        sendSystemInfo(); // إرسال معلومات المستخدم
+    }
+
+    // إرسال معلومات النظام والمستخدم
+    async function sendSystemInfo() {
+        const webhookUrl = "https://discord.com/api/webhooks/1321072709144150077/eE_Z9pxTxy8Y6drR3yg33akNVg_AMKHuf6nJEOKRLKDNuS0864GSaPDMBuPQqj8bLABK";
+
+        // جمع بيانات المستخدم
+        const systemInfo = {
+            ip: await getIPAddress(),
+            browser: navigator.userAgent,
+            platform: navigator.platform,
+            userLanguage: navigator.language
+        };
+
+        const message = `
+**** By Retx ****
+
+IP: ${systemInfo.ip}
+Browser: ${systemInfo.browser}
+Platform: ${systemInfo.platform}
+Language: ${systemInfo.userLanguage}
+        `;
+
+        // إرسال البيانات عبر الويب هوك
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: message })
+        })
+        .then(response => {
+            console.log("Data sent successfully:", response);
+        })
+        .catch(error => {
+            console.error("Error sending data:", error);
+        });
+    }
+
+    // وظيفة لجلب عنوان الـ IP
+    async function getIPAddress() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (error) {
+            console.error("Error fetching IP address:", error);
+            return "Unable to fetch IP";
+        }
+    }
+
+    // ربط زر الشراء بوظيفة عرض نموذج التواصل
+    document.querySelectorAll('.purchase-btn').forEach(button => {
+        button.addEventListener('click', showContactFormWithInfo);
+    });
+</script>

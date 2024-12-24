@@ -1,0 +1,6 @@
+.card img {
+    width: 100%; /* تأكد أن الصورة تملأ عرض الصندوق */
+    max-width: 300px; /* تعيين حجم ثابت لجميع الصور */
+    height: auto;
+    border-radius: 15px;
+}
